@@ -17,9 +17,9 @@ class PlaneCut(ScriptedLoadableModule):
   def __init__(self, parent):
     ScriptedLoadableModule.__init__(self, parent)
     self.parent.title = "PlaneCut"  # TODO: make this more human readable by adding spaces
-    self.parent.categories = ["Examples"]  # TODO: set categories (folders where the module shows up in the module selector)
+    self.parent.categories = ["Utilities"]  # TODO: set categories (folders where the module shows up in the module selector)
     self.parent.dependencies = []  # TODO: add here list of module names that this module requires
-    self.parent.contributors = ["John Doe (AnyWare Corp.)"]  # TODO: replace with "Firstname Lastname (Organization)"
+    self.parent.contributors = ["Li Bin Song(UofA)"]  # TODO: replace with "Firstname Lastname (Organization)"
     # TODO: update with short description of the module and a link to online module documentation
     self.parent.helpText = """
 This is an example of scripted loadable module bundled in an extension.
@@ -250,7 +250,6 @@ class PlaneCutWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     wasModified = self._parameterNode.StartModify()  # Modify all properties in a single batch
 
     self._parameterNode.SetNodeReferenceID("InputVolume", self.ui.inputSelector.currentNodeID)
-    self._parameterNode.SetNodeReferenceID("OutputVolume", self.ui.outputSelector.currentNodeID)
     self._parameterNode.SetParameter("Threshold", str(self.ui.imageThresholdSliderWidget.value))
     self._parameterNode.SetParameter("Invert", "true" if self.ui.invertOutputCheckBox.checked else "false")
     self._parameterNode.SetNodeReferenceID("OutputVolumeInverse", self.ui.invertedOutputSelector.currentNodeID)
