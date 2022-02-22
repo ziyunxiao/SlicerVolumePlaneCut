@@ -4,7 +4,7 @@ import logging
 import vtk, qt, ctk, slicer
 from slicer.ScriptedLoadableModule import *
 from slicer.util import VTKObservationMixin
-
+from funcs import showVolumeRendering
 #
 # PlaneCut
 #
@@ -260,6 +260,8 @@ class PlaneCutWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     """
     Run processing when user clicks "Apply" button.
     """
+
+    print("onApplyButton is clicked.")
     with slicer.util.tryWithErrorDisplay("Failed to compute results.", waitCursor=True):
 
       # self.logic.process(self.ui.inputSelector.currentNode(), self.ui.outputSelector.currentNode(),
@@ -318,10 +320,12 @@ class PlaneCutLogic(ScriptedLoadableModuleLogic):
     logging.info('Processing started')
 
     # Compute the thresholded output volume using the "Threshold Scalar Volume" CLI module
-    InputVolume =  inputVolume.GetID()
+    inputID = inputVolume.GetID()
+    logging.info(f"Input Volume ID: {inputID}")
     # cliNode = slicer.cli.run(slicer.modules.thresholdscalarvolume, None, cliParams, wait_for_completion=True, update_display=showResult)
     # We don't need the CLI module node anymore, remove it to not clutter the scene with it
     # slicer.mrmlScene.RemoveNode(cliNode)
+    showVolumeRendering(inputVolume,True)
 
     stopTime = time.time()
     logging.info(f'Processing completed in {stopTime-startTime:.2f} seconds')
