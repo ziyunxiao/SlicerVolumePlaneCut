@@ -26,7 +26,7 @@ def showVolumeRendering(volumeNode, adjust_preset=False):
                 volRenLogic.GetPresetByName("CT-Chest-Contrast-Enhanced"))
 
 
-def VolumePlaneCut(volumeNode, iren):
+def ShowVolumePlaneCut(volumeNode, iren):
     # Define volume mapper
     volumeMapper = vtk.vtkSmartVolumeMapper()
     # volumeMapper = vtk.vtkVolumeMapper()
@@ -57,3 +57,14 @@ def VolumePlaneCut(volumeNode, iren):
     planeWidget.PlaceWidget()
     planeWidget.On()
     planeWidget.AddObserver("InteractionEvent", clipVolumeRender)
+
+def show_3Dviews():
+    layoutManager = slicer.app.layoutManager()
+    for threeDViewIndex in range(layoutManager.threeDViewCount) :
+        view = layoutManager.threeDWidget(threeDViewIndex).threeDView()
+        threeDViewNode = view.mrmlViewNode()
+        cameraNode = slicer.modules.cameras.logic().GetViewActiveCameraNode(threeDViewNode)
+        print("View node for 3D widget " + str(threeDViewIndex))
+        print("  Name: " + threeDViewNode .GetName())
+        print("  ID: " + threeDViewNode .GetID())
+        print("  Camera ID: " + cameraNode.GetID())

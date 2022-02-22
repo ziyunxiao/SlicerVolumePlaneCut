@@ -23,13 +23,33 @@ displayNode.SetCroppingEnabled(True)
 roiNode.GetDisplayNode().SetVisibility(True)
 
 
-
+# planes
 planes = vtk.vtkPlanes()
 roiNode.GetPlanes(planes)
 roiNode.SetVisibility(False)
 n1 = planes.GetNumberOfPlanes()
 print(f"Number of Planes {n1}")
 
+
+# view node
+view1Node = slicer.mrmlScene.GetFirstNodeByClass("vtkMRMLViewNode")
+print(f"view1 node: {view1Node.GetID()}")
+
+viewNode = slicer.app.layoutManager().threeDWidget(0).mrmlViewNode()
+viewNode.SetBackgroundColor(0,0,0)
+viewNode.SetBackgroundColor2(0,0,0)
+
+# 3view
+view = slicer.app.layoutManager().threeDWidget(0).threeDView()
+view.mrmlViewNode().SetBackgroundColor(0,0,0)
+view.mrmlViewNode().SetBackgroundColor2(0,0,0)
+
+# get renderer
+renderWindow = view.renderWindow()
+renderers = renderWindow.GetRenderers()
+print(renderers.GetFirstRenderer().GetClassName())
+renderer = renderers.GetItemAsObject(0)
+camera = cameraNode.GetCamera()
 
 ```
 ## Volume rendering
@@ -55,8 +75,31 @@ showVolumeRendering(volumeNode)
 
 ```
 
-
-
+Download smaple data
+```py
+import SampleData
+sampleDataLogic = SampleData.SampleDataLogic()
+sampleDataLogic.downloadMRHead()
 ```
+
+Get Node by class
+```py
 slicer.mrmlScene.GetFirstNodeByClass("vtkMRMLSegmentationNode")
+```
+
+Accessing slice vtkRenderWindows from slice views
+The example below shows how to get the rendered slice window.
+
+```py
+lm = slicer.app.layoutManager()
+redWidget = lm.sliceWidget('Red')
+redView = redWidget.sliceView()
+wti = vtk.vtkWindowToImageFilter()
+wti.SetInput(redView.renderWindow())
+wti.Update()
+v = vtk.vtkImageViewer()
+v.SetColorWindow(255)
+v.SetColorLevel(128)
+v.SetInputConnection(wti.GetOutputPort())
+v.Render()
 ```
