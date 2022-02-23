@@ -84,6 +84,8 @@ renderer = renderers.GetItemAsObject(0)
 camera = cameraNode.GetCamera()
 
 # get Interactor
+view = slicer.app.layoutManager().threeDWidget(0).threeDView()
+renWin = view.renderWindow()
 iren = renWin.GetInteractor()
 
 ```

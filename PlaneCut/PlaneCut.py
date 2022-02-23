@@ -70,16 +70,19 @@ class VolumePlaneWidget(object):
 
     def clipVolumeRender(self,widget, event):
         widget.GetPlane(self.plane)
-        # self.volumeMapper.AddClippingPlane(self.plane)
+        self.volumeMapper.AddClippingPlane(self.plane)
         print(f"clipVolumeRender: {event}")
 
 
     def ShowVolumePlaneCut(self,renWin):
         # setup pipline
         renWin.AddRenderer(self.ren)
-        iren = renWin.GetInteractor()
-        # iren = vtk.vtkRenderWindowInteractor()
-        # iren.SetRenderWindow(renWin)
+
+        # iren = renWin.GetInteractor()
+        iren = vtk.vtkRenderWindowInteractor()
+        iren.SetRenderWindow(renWin)
+        renWin.DebugOn()
+        iren.DebugOn()
 
         # create plane widget
         planeWidget = vtk.vtkImplicitPlaneWidget()
@@ -103,11 +106,11 @@ class VolumePlaneWidget(object):
         planeWidget.On()
         planeWidget.AddObserver("InteractionEvent", self.clipVolumeRender)
         
-        # iren.Initialize()
-        # renWin.Render()
-        # iren.Start()
+        iren.Initialize()
+        renWin.Render()
+        iren.Start()
 
-        return iren
+        return
 
 
 
