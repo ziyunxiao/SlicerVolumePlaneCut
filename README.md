@@ -83,6 +83,9 @@ print(renderers.GetFirstRenderer().GetClassName())
 renderer = renderers.GetItemAsObject(0)
 camera = cameraNode.GetCamera()
 
+# get Interactor
+iren = renWin.GetInteractor()
+
 ```
 ## Volume rendering
 

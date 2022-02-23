@@ -70,15 +70,16 @@ class VolumePlaneWidget(object):
 
     def clipVolumeRender(self,widget, event):
         widget.GetPlane(self.plane)
-        self.volumeMapper.AddClippingPlane(self.plane)
+        # self.volumeMapper.AddClippingPlane(self.plane)
         print(f"clipVolumeRender: {event}")
 
 
     def ShowVolumePlaneCut(self,renWin):
         # setup pipline
         renWin.AddRenderer(self.ren)
-        iren = vtk.vtkRenderWindowInteractor()
-        iren.SetRenderWindow(renWin)
+        iren = renWin.GetInteractor()
+        # iren = vtk.vtkRenderWindowInteractor()
+        # iren.SetRenderWindow(renWin)
 
         # create plane widget
         planeWidget = vtk.vtkImplicitPlaneWidget()
@@ -102,7 +103,7 @@ class VolumePlaneWidget(object):
         planeWidget.On()
         planeWidget.AddObserver("InteractionEvent", self.clipVolumeRender)
         
-        iren.Initialize()
+        # iren.Initialize()
         # renWin.Render()
         # iren.Start()
 
@@ -425,7 +426,7 @@ class PlaneCutLogic(ScriptedLoadableModuleLogic):
     # cliNode = slicer.cli.run(slicer.modules.thresholdscalarvolume, None, cliParams, wait_for_completion=True, update_display=showResult)
     # We don't need the CLI module node anymore, remove it to not clutter the scene with it
     # slicer.mrmlScene.RemoveNode(cliNode)
-    showVolumeRendering(inputVolume,True)
+    # showVolumeRendering(inputVolume,True)
 
     view = slicer.app.layoutManager().threeDWidget(0).threeDView()
     renWin = view.renderWindow()
