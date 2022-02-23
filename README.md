@@ -13,10 +13,22 @@ volumeNode.GetID()
 
 print("Volume size: {0}".format(volumeNode.GetImageData().GetDimensions()))
 
-displayNode = volRenLogic.CreateDefaultVolumeRenderingNodes(volumeNode)
+volRenLogic = slicer.modules.volumerendering.logic()
+displayNode = volRenLogic.GetFirstVolumeRenderingDisplayNode(volumeNode)
+
+displayNode = volumeNode.GetDisplayNode(volumeNode)
+
 print(f"Display Node: { displayNode.GetID() }")
 roiNode = displayNode.GetMarkupsROINode()
 print(f"Display Markup Node: { roiNode.GetID() }")
+
+# volume property
+displayNode.GetVolumePropertyNode().GetVolumeProperty()
+
+# load volume from file
+volume = slicer.util.loadVolume(file_name)
+# numpy array from Volume
+voxels = slicer.util.arrayFromVolume(volumeNode)
 
 # croping
 displayNode.SetCroppingEnabled(True)
@@ -43,6 +55,10 @@ viewNode.SetBackgroundColor2(0,0,0)
 view = slicer.app.layoutManager().threeDWidget(0).threeDView()
 view.mrmlViewNode().SetBackgroundColor(0,0,0)
 view.mrmlViewNode().SetBackgroundColor2(0,0,0)
+# reset 3d views
+slicer.util.resetThreeDViews()
+
+
 
 # get renderer
 renderWindow = view.renderWindow()

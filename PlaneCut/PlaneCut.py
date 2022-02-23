@@ -4,11 +4,110 @@ import logging
 import vtk, qt, ctk, slicer
 from slicer.ScriptedLoadableModule import *
 from slicer.util import VTKObservationMixin
-from funcs import showVolumeRendering, ShowVolumePlaneCut
+# from PlaneCut.funcs import showVolumeRendering, ShowVolumePlaneCut
 
 #
 # planecut
 #
+
+def show_3Dviews():
+    layoutManager = slicer.app.layoutManager()
+    for threeDViewIndex in range(layoutManager.threeDViewCount) :
+        view = layoutManager.threeDWidget(threeDViewIndex).threeDView()
+        threeDViewNode = view.mrmlViewNode()
+        cameraNode = slicer.modules.cameras.logic().GetViewActiveCameraNode(threeDViewNode)
+        print("View node for 3D widget " + str(threeDViewIndex))
+        print("  Name: " + threeDViewNode .GetName())
+        print("  ID: " + threeDViewNode .GetID())
+        print("  Camera ID: " + cameraNode.GetID())
+
+def showVolumeRendering(volumeNode, adjust_preset=False):
+    print("Show volume rendering of node " + volumeNode.GetName())
+    volRenLogic = slicer.modules.volumerendering.logic()
+    displayNode = volRenLogic.CreateDefaultVolumeRenderingNodes(volumeNode)
+    # disply volume rendering
+    displayNode.SetVisibility(True)
+
+    # croping
+    # roiNode = displayNode.GetMarkupsROINode()
+    # displayNode.SetCroppingEnabled(True)
+    # roiNode.GetDisplayNode().SetVisibility(True)
+
+    scalarRange = volumeNode.GetImageData().GetScalarRange()
+    if adjust_preset:
+        if scalarRange[1]-scalarRange[0] < 1500:
+            # Small dynamic range, probably MRI
+            displayNode.GetVolumePropertyNode().Copy(
+                volRenLogic.GetPresetByName("MR-Default"))
+        else:
+            # Larger dynamic range, probably CT
+            displayNode.GetVolumePropertyNode().Copy(
+                volRenLogic.GetPresetByName("CT-Chest-Contrast-Enhanced"))
+
+
+class VolumePlaneWidget(object):
+
+    def __init__(self, volumeNode) -> None:
+
+        self.volumeNode = volumeNode
+
+        self.volume = vtk.vtkVolume()
+        self.ren = vtk.vtkRenderer()
+        self.ren.AddVolume(self.volume)
+
+        # displayNode = volumeNode.GetDisplayNode()
+        volRenLogic = slicer.modules.volumerendering.logic()
+        displayNode = volRenLogic.CreateDefaultVolumeRenderingNodes(volumeNode)
+        volumeProperty = displayNode.GetVolumePropertyNode().GetVolumeProperty()
+        self.volume.SetProperty(volumeProperty)
+
+         # Define volume mapper
+        self.volumeMapper = vtk.vtkSmartVolumeMapper()
+        # self.volumeMapper.SetInputData(self.volumeNode.GetImageData())
+        self.volumeMapper.SetInputConnection(self.volumeNode.GetImageDataConnection())
+        self.volume.SetMapper(self.volumeMapper)
+
+
+    def clipVolumeRender(self,widget, event):
+        widget.GetPlane(self.plane)
+        self.volumeMapper.AddClippingPlane(self.plane)
+        print(f"clipVolumeRender: {event}")
+
+
+    def ShowVolumePlaneCut(self,renWin):
+        # setup pipline
+        renWin.AddRenderer(self.ren)
+        iren = vtk.vtkRenderWindowInteractor()
+        iren.SetRenderWindow(renWin)
+
+        # create plane widget
+        planeWidget = vtk.vtkImplicitPlaneWidget()
+        planeWidget.SetInteractor(iren)
+        planeWidget.SetPlaceFactor(1.0)
+
+        self.plane = vtk.vtkPlane()
+        # center = self.reader.GetOutput().GetCenter()
+        # self.plane.SetOrigin(center)
+
+        planeWidget.SetInputData(self.volume.GetMapper().GetInput())
+        planeWidget.GetSelectedOutlineProperty().SetColor(1, 0, 1)
+        planeWidget.GetOutlineProperty().SetColor(0.2, 0.2, 0.2)
+        planeWidget.GetOutlineProperty().SetOpacity(0.7)
+        planeWidget.SetPlaceFactor(1.0)
+
+        planeprop = planeWidget.GetPlaneProperty()
+        planeprop.SetColor(1, 0, 1)
+        planeprop.SetOpacity(0.1)
+        planeWidget.PlaceWidget()
+        planeWidget.On()
+        planeWidget.AddObserver("InteractionEvent", self.clipVolumeRender)
+        
+        iren.Initialize()
+        # renWin.Render()
+        # iren.Start()
+
+        return iren
+
 
 
 class PlaneCut(ScriptedLoadableModule):
@@ -254,8 +353,7 @@ class PlaneCutWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     self._parameterNode.SetNodeReferenceID("InputVolume", self.ui.inputSelector.currentNodeID)
     self._parameterNode.SetParameter("Threshold", str(self.ui.imageThresholdSliderWidget.value))
     self._parameterNode.SetParameter("Invert", "true" if self.ui.invertOutputCheckBox.checked else "false")
-    self._parameterNode.SetNodeReferenceID("OutputVolumeInverse", self.ui.invertedOutputSelector.currentNodeID)
-
+    
     self._parameterNode.EndModify(wasModified)
 
   def onApplyButton(self):
@@ -331,6 +429,8 @@ class PlaneCutLogic(ScriptedLoadableModuleLogic):
 
     view = slicer.app.layoutManager().threeDWidget(0).threeDView()
     renWin = view.renderWindow()
+    vw = VolumePlaneWidget(inputVolume)
+    vw.ShowVolumePlaneCut(renWin)
     # ShowVolumePlaneCut(inputVolume.GetImageData(),renWin)
 
 
