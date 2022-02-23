@@ -1,3 +1,19 @@
+# Install & Usage
+
+## Pre-quirements 
+The extension is developed with Slicer 4.13 preview with Python 3.9 + VTK 9.1
+
+## Setup
+1. clone the project  `git clone https://github.com/ziyunxiao/SlicerVolumePlaneCut.git`
+2. start Slicer
+3. Install the extension. 
+   1. Go to Mudule Extension Wizard under "developer tools"/"Extension Wizard"
+   2. Click Select Extension
+   3. Select project folder "VolumePlaneCut"
+   4. The extension is loaded. And you can go to Utilities/Plancut for later use
+
+## Usage
+
 
 
 # Development tips
