@@ -295,7 +295,7 @@ class PlaneCutWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         # Update buttons states and tooltips
         if self._parameterNode.GetNodeReference("InputVolume"):
-            self.ui.applyButton.toolTip = "Show Volume Rendering"
+            self.ui.applyButton.toolTip = "Apply Rotation of Display ROI"
             self.ui.applyButton.enabled = True
         else:
             self.ui.applyButton.toolTip = "Select input nodes"
@@ -335,7 +335,10 @@ class PlaneCutWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         print("onApplyButton is clicked.")
         with slicer.util.tryWithErrorDisplay("Failed to compute results.", waitCursor=True):
             # custome code RS
-            self.logic.process(self.ui.inputSelector.currentNode())
+            LR = self.ui.SliderWidget_LR.value
+            LA = self.ui.SliderWidget_LA.value
+            LS = self.ui.SliderWidget_LS.value
+            self.logic.process(self.ui.inputSelector.currentNode(),LR, LA, LS)
 
 #
 # PlaneCutLogic
@@ -368,7 +371,7 @@ class PlaneCutLogic(ScriptedLoadableModuleLogic):
         if not parameterNode.GetParameter("LS"):
             parameterNode.SetParameter("LS", "0")            
 
-    def process(self, inputVolume):
+    def process(self, inputVolume, LR, LA, LS):
         """
         Run the processing algorithm.
         Can be used without GUI widget.
@@ -395,7 +398,10 @@ class PlaneCutLogic(ScriptedLoadableModuleLogic):
 
         # rotabe 
         trans = vtk.vtkTransform()
-        trans.RotateX()
+        logging.info(f"RAS value: {(LR, LA, LS)} xyz value: {(-LR,-LA,LS)}")
+        trans.RotateX(-LR)
+        trans.RotateY(-LA)
+        trans.RotateZ(LS)
         # trans.GetMatrix()
         volumeRoi.ApplyTransform(trans)
 
