@@ -54,8 +54,11 @@
       </item>
       <item row="3" column="1">
        <widget class="ctkSliderWidget" name="SliderWidget_LA">
+        <property name="minimum">
+         <double>-180.000000000000000</double>
+        </property>
         <property name="maximum">
-         <double>360.000000000000000</double>
+         <double>180.000000000000000</double>
         </property>
        </widget>
       </item>
@@ -68,15 +71,24 @@
       </item>
       <item row="4" column="1">
        <widget class="ctkSliderWidget" name="SliderWidget_LS">
+        <property name="minimum">
+         <double>-180.000000000000000</double>
+        </property>
         <property name="maximum">
-         <double>360.000000000000000</double>
+         <double>180.000000000000000</double>
         </property>
        </widget>
       </item>
       <item row="2" column="1">
        <widget class="ctkSliderWidget" name="SliderWidget_LR">
+        <property name="minimum">
+         <double>-180.000000000000000</double>
+        </property>
         <property name="maximum">
-         <double>360.000000000000000</double>
+         <double>180.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>0.000000000000000</double>
         </property>
        </widget>
       </item>

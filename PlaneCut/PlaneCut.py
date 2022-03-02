@@ -143,7 +143,7 @@ This project is created with MM802 course at UofA 2022 by Li Bin Song and Antarp
 """
 
         # Additional initialization step after application startup is complete
-        slicer.app.connect("startupCompleted()", registerSampleData)
+        # slicer.app.connect("startupCompleted()", registerSampleData)
 
 #
 # PlaneCutWidget
