@@ -88,6 +88,19 @@ view = slicer.app.layoutManager().threeDWidget(0).threeDView()
 renWin = view.renderWindow()
 iren = renWin.GetInteractor()
 
+
+# Volume Rendering ROI
+volumeRoi = slicer.mrmlScene.GetFirstNodeByClass("vtkMRMLMarkupsROINode")
+volumeRoi.GetID()
+volumeRoi.GetCenter()
+# (vtkmodules.vtkCommonDataModel.vtkVector3d)[0.38079845905303955, -22.919204711914062, -175.25]
+
+# Rotate roi widget
+trans = vtk.vtkTransform()
+trans.RotateX(45)
+# trans.GetMatrix()
+volumeRoi.ApplyTransform(trans)
+
 ```
 ## Volume rendering
 

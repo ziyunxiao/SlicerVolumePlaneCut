@@ -13,7 +13,6 @@ from slicer.util import VTKObservationMixin
 # planecut
 #
 
-
 def show_3Dviews():
     layoutManager = slicer.app.layoutManager()
     for threeDViewIndex in range(layoutManager.threeDViewCount):
@@ -82,9 +81,9 @@ class VolumePlaneWidget(object):
         # setup pipline
         renWin.AddRenderer(self.ren)
 
-        # iren = renWin.GetInteractor()
-        iren = vtk.vtkRenderWindowInteractor()
-        iren.SetRenderWindow(renWin)
+        iren = renWin.GetInteractor()
+        # iren = vtk.vtkRenderWindowInteractor()
+        # iren.SetRenderWindow(renWin)
         renWin.DebugOn()
         iren.DebugOn()
 
@@ -110,16 +109,9 @@ class VolumePlaneWidget(object):
         planeWidget.On()
         planeWidget.AddObserver("InteractionEvent", self.clipVolumeRender)
 
-        iren.Initialize()
+        # iren.Initialize()
         renWin.Render()
-
-        volRenLogic = slicer.modules.volumerendering.logic()
-        displayNode = volRenLogic.CreateDefaultVolumeRenderingNodes(
-            self.volumeNode)
-        # disply volume rendering
-        displayNode.SetVisibility(True)
-
-        iren.Start()
+        # iren.Start()
 
         return
 
@@ -141,72 +133,21 @@ class PlaneCut(ScriptedLoadableModule):
         self.parent.contributors = ["Li Bin Song(UofA)"]
         # TODO: update with short description of the module and a link to online module documentation
         self.parent.helpText = """
-This is an example of scripted loadable module bundled in an extension.
-See more information in <a href="https://github.com/organization/projectname#PlaneCut">module documentation</a>.
+This is an extension to enhance the function of volume rendering. The out of box volume redering function includes function of crop. While this function is fixed on six faces of ROI widget cube.
+this extension enable the function to rotate the widget cube in 360 degrees. And this will give the user capability to cut the volume in any direction and any position.
+For more details please visit GitHub <a href="https://github.com/ziyunxiao/SlicerVolumePlaneCut">source code</a>.
 """
         # TODO: replace with organization, grant and thanks
         self.parent.acknowledgementText = """
-This file was originally developed by Jean-Christophe Fillion-Robin, Kitware Inc., Andras Lasso, PerkLab,
-and Steve Pieper, Isomics, Inc. and was partially funded by NIH grant 3P41RR013218-12S1.
+This project is created with MM802 course at UofA 2022 by Li Bin Song and Antarpuneet Singh with the guidance from Professor Kumaradevan Punithakumar.  
 """
 
         # Additional initialization step after application startup is complete
         slicer.app.connect("startupCompleted()", registerSampleData)
 
 #
-# Register sample data sets in Sample Data module
-#
-
-
-def registerSampleData():
-    """
-    Add data sets to Sample Data module.
-    """
-    # It is always recommended to provide sample data for users to make it easy to try the module,
-    # but if no sample data is available then this method (and associated startupCompeted signal connection) can be removed.
-
-    import SampleData
-    iconsPath = os.path.join(os.path.dirname(__file__), 'Resources/Icons')
-
-    # To ensure that the source code repository remains small (can be downloaded and installed quickly)
-    # it is recommended to store data sets that are larger than a few MB in a Github release.
-
-    # PlaneCut1
-    SampleData.SampleDataLogic.registerCustomSampleDataSource(
-        # Category and sample name displayed in Sample Data module
-        category='PlaneCut',
-        sampleName='PlaneCut1',
-        # Thumbnail should have size of approximately 260x280 pixels and stored in Resources/Icons folder.
-        # It can be created by Screen Capture module, "Capture all views" option enabled, "Number of images" set to "Single".
-        thumbnailFileName=os.path.join(iconsPath, 'PlaneCut1.png'),
-        # Download URL and target file name
-        uris="https://github.com/Slicer/SlicerTestingData/releases/download/SHA256/998cb522173839c78657f4bc0ea907cea09fd04e44601f17c82ea27927937b95",
-        fileNames='PlaneCut1.nrrd',
-        # Checksum to ensure file integrity. Can be computed by this command:
-        #  import hashlib; print(hashlib.sha256(open(filename, "rb").read()).hexdigest())
-        checksums='SHA256:998cb522173839c78657f4bc0ea907cea09fd04e44601f17c82ea27927937b95',
-        # This node name will be used when the data set is loaded
-        nodeNames='PlaneCut1'
-    )
-
-    # PlaneCut2
-    SampleData.SampleDataLogic.registerCustomSampleDataSource(
-        # Category and sample name displayed in Sample Data module
-        category='PlaneCut',
-        sampleName='PlaneCut2',
-        thumbnailFileName=os.path.join(iconsPath, 'PlaneCut2.png'),
-        # Download URL and target file name
-        uris="https://github.com/Slicer/SlicerTestingData/releases/download/SHA256/1a64f3f422eb3d1c9b093d1a18da354b13bcf307907c66317e2463ee530b7a97",
-        fileNames='PlaneCut2.nrrd',
-        checksums='SHA256:1a64f3f422eb3d1c9b093d1a18da354b13bcf307907c66317e2463ee530b7a97',
-        # This node name will be used when the data set is loaded
-        nodeNames='PlaneCut2'
-    )
-
-#
 # PlaneCutWidget
 #
-
 
 class PlaneCutWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     """Uses ScriptedLoadableModuleWidget base class, available at:
@@ -352,14 +293,6 @@ class PlaneCutWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         # Make sure GUI changes do not call updateParameterNodeFromGUI (it could cause infinite loop)
         self._updatingGUIFromParameterNode = True
 
-        # Update node selectors and sliders
-        self.ui.inputSelector.setCurrentNode(
-            self._parameterNode.GetNodeReference("InputVolume"))
-        self.ui.imageThresholdSliderWidget.value = float(
-            self._parameterNode.GetParameter("Threshold"))
-        self.ui.invertOutputCheckBox.checked = (
-            self._parameterNode.GetParameter("Invert") == "true")
-
         # Update buttons states and tooltips
         if self._parameterNode.GetNodeReference("InputVolume"):
             self.ui.applyButton.toolTip = "Show Volume Rendering"
@@ -385,10 +318,12 @@ class PlaneCutWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         self._parameterNode.SetNodeReferenceID(
             "InputVolume", self.ui.inputSelector.currentNodeID)
-        self._parameterNode.SetParameter("Threshold", str(
-            self.ui.imageThresholdSliderWidget.value))
-        self._parameterNode.SetParameter(
-            "Invert", "true" if self.ui.invertOutputCheckBox.checked else "false")
+        self._parameterNode.SetParameter("LR", str(
+            self.ui.SliderWidget_LR.value))
+        self._parameterNode.SetParameter("LA", str(
+            self.ui.SliderWidget_LA.value))
+        self._parameterNode.SetParameter("LS", str(
+            self.ui.SliderWidget_LS.value))
 
         self._parameterNode.EndModify(wasModified)
 
@@ -399,23 +334,12 @@ class PlaneCutWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         print("onApplyButton is clicked.")
         with slicer.util.tryWithErrorDisplay("Failed to compute results.", waitCursor=True):
-
-            # self.logic.process(self.ui.inputSelector.currentNode(), self.ui.outputSelector.currentNode(),
-            #   self.ui.imageThresholdSliderWidget.value, self.ui.invertOutputCheckBox.checked)
-
-            # # Compute inverted output (if needed)
-            # if self.ui.invertedOutputSelector.currentNode():
-            #   # If additional output volume is selected then result with inverted threshold is written there
-            #   self.logic.process(self.ui.inputSelector.currentNode(), self.ui.invertedOutputSelector.currentNode(),
-            #     self.ui.imageThresholdSliderWidget.value, not self.ui.invertOutputCheckBox.checked, showResult=False)
-
             # custome code RS
             self.logic.process(self.ui.inputSelector.currentNode())
 
 #
 # PlaneCutLogic
 #
-
 
 class PlaneCutLogic(ScriptedLoadableModuleLogic):
     """This class should implement all the actual
@@ -437,10 +361,12 @@ class PlaneCutLogic(ScriptedLoadableModuleLogic):
         """
         Initialize parameter node with default settings.
         """
-        if not parameterNode.GetParameter("Threshold"):
-            parameterNode.SetParameter("Threshold", "100.0")
-        if not parameterNode.GetParameter("Invert"):
-            parameterNode.SetParameter("Invert", "false")
+        if not parameterNode.GetParameter("LR"):
+            parameterNode.SetParameter("LR", "0")
+        if not parameterNode.GetParameter("LA"):
+            parameterNode.SetParameter("LA", "0")
+        if not parameterNode.GetParameter("LS"):
+            parameterNode.SetParameter("LS", "0")            
 
     def process(self, inputVolume):
         """
@@ -456,19 +382,22 @@ class PlaneCutLogic(ScriptedLoadableModuleLogic):
         startTime = time.time()
         logging.info('Processing started')
 
-        # Compute the thresholded output volume using the "Threshold Scalar Volume" CLI module
         inputID = inputVolume.GetID()
         logging.info(f"Input Volume ID: {inputID}")
-        # cliNode = slicer.cli.run(slicer.modules.thresholdscalarvolume, None, cliParams, wait_for_completion=True, update_display=showResult)
-        # We don't need the CLI module node anymore, remove it to not clutter the scene with it
-        # slicer.mrmlScene.RemoveNode(cliNode)
-        # showVolumeRendering(inputVolume,True)
 
-        view = slicer.app.layoutManager().threeDWidget(0).threeDView()
-        renWin = view.renderWindow()
-        vw = VolumePlaneWidget(inputVolume)
-        vw.ShowVolumePlaneCut(renWin)
-        # ShowVolumePlaneCut(inputVolume.GetImageData(),renWin)
+        # retrieve Display ROI Node
+        volumeRoi = slicer.mrmlScene.GetFirstNodeByClass("vtkMRMLMarkupsROINode")
+        if volumeRoi is None:
+            raise UnboundLocalError("Display ROI not found. Please run volume rendering fisrt and check Display ROI and enable crop.")
+
+        logging.info(f"Display ROI node: {volumeRoi.GetID()}")
+        # volumeRoi.GetCenter()
+
+        # rotabe 
+        trans = vtk.vtkTransform()
+        trans.RotateX()
+        # trans.GetMatrix()
+        volumeRoi.ApplyTransform(trans)
 
         stopTime = time.time()
         logging.info(
@@ -477,7 +406,6 @@ class PlaneCutLogic(ScriptedLoadableModuleLogic):
 #
 # PlaneCutTest
 #
-
 
 class PlaneCutTest(ScriptedLoadableModuleTest):
     """
@@ -514,32 +442,24 @@ class PlaneCutTest(ScriptedLoadableModuleTest):
         # Get/create input data
 
         import SampleData
-        registerSampleData()
-        inputVolume = SampleData.downloadSample('PlaneCut1')
+        inputVolume = SampleData.downloadSample('CTChest')
         self.delayDisplay('Loaded test data set')
 
         inputScalarRange = inputVolume.GetImageData().GetScalarRange()
         self.assertEqual(inputScalarRange[0], 0)
         self.assertEqual(inputScalarRange[1], 695)
 
-        outputVolume = slicer.mrmlScene.AddNewNodeByClass(
-            "vtkMRMLScalarVolumeNode")
-        threshold = 100
+        # threshold = 100
 
         # Test the module logic
 
         logic = PlaneCutLogic()
 
         # Test algorithm with non-inverted threshold
-        logic.process(inputVolume, outputVolume, threshold, True)
-        outputScalarRange = outputVolume.GetImageData().GetScalarRange()
-        self.assertEqual(outputScalarRange[0], inputScalarRange[0])
-        self.assertEqual(outputScalarRange[1], threshold)
+        # logic.process(inputVolume, outputVolume, threshold, True)
+        # outputScalarRange = outputVolume.GetImageData().GetScalarRange()
+        # self.assertEqual(outputScalarRange[0], inputScalarRange[0])
+        # self.assertEqual(outputScalarRange[1], threshold)
 
-        # Test algorithm with inverted threshold
-        logic.process(inputVolume, outputVolume, threshold, False)
-        outputScalarRange = outputVolume.GetImageData().GetScalarRange()
-        self.assertEqual(outputScalarRange[0], inputScalarRange[0])
-        self.assertEqual(outputScalarRange[1], inputScalarRange[1])
 
         self.delayDisplay('Test passed')
