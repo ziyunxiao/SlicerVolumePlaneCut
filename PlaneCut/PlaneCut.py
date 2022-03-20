@@ -13,40 +13,40 @@ from slicer.util import VTKObservationMixin
 # planecut
 #
 
-def show_3Dviews():
-    layoutManager = slicer.app.layoutManager()
-    for threeDViewIndex in range(layoutManager.threeDViewCount):
-        view = layoutManager.threeDWidget(threeDViewIndex).threeDView()
-        threeDViewNode = view.mrmlViewNode()
-        cameraNode = slicer.modules.cameras.logic().GetViewActiveCameraNode(threeDViewNode)
-        print("View node for 3D widget " + str(threeDViewIndex))
-        print("  Name: " + threeDViewNode .GetName())
-        print("  ID: " + threeDViewNode .GetID())
-        print("  Camera ID: " + cameraNode.GetID())
+# def show_3Dviews():
+#     layoutManager = slicer.app.layoutManager()
+#     for threeDViewIndex in range(layoutManager.threeDViewCount):
+#         view = layoutManager.threeDWidget(threeDViewIndex).threeDView()
+#         threeDViewNode = view.mrmlViewNode()
+#         cameraNode = slicer.modules.cameras.logic().GetViewActiveCameraNode(threeDViewNode)
+#         print("View node for 3D widget " + str(threeDViewIndex))
+#         print("  Name: " + threeDViewNode .GetName())
+#         print("  ID: " + threeDViewNode .GetID())
+#         print("  Camera ID: " + cameraNode.GetID())
 
 
-def showVolumeRendering(volumeNode, adjust_preset=False):
-    print("Show volume rendering of node " + volumeNode.GetName())
-    volRenLogic = slicer.modules.volumerendering.logic()
-    displayNode = volRenLogic.CreateDefaultVolumeRenderingNodes(volumeNode)
-    # disply volume rendering
-    displayNode.SetVisibility(True)
+# def showVolumeRendering(volumeNode, adjust_preset=False):
+#     print("Show volume rendering of node " + volumeNode.GetName())
+#     volRenLogic = slicer.modules.volumerendering.logic()
+#     displayNode = volRenLogic.CreateDefaultVolumeRenderingNodes(volumeNode)
+#     # disply volume rendering
+#     displayNode.SetVisibility(True)
 
-    # croping
-    # roiNode = displayNode.GetMarkupsROINode()
-    # displayNode.SetCroppingEnabled(True)
-    # roiNode.GetDisplayNode().SetVisibility(True)
+#     # croping
+#     # roiNode = displayNode.GetMarkupsROINode()
+#     # displayNode.SetCroppingEnabled(True)
+#     # roiNode.GetDisplayNode().SetVisibility(True)
 
-    scalarRange = volumeNode.GetImageData().GetScalarRange()
-    if adjust_preset:
-        if scalarRange[1]-scalarRange[0] < 1500:
-            # Small dynamic range, probably MRI
-            displayNode.GetVolumePropertyNode().Copy(
-                volRenLogic.GetPresetByName("MR-Default"))
-        else:
-            # Larger dynamic range, probably CT
-            displayNode.GetVolumePropertyNode().Copy(
-                volRenLogic.GetPresetByName("CT-Chest-Contrast-Enhanced"))
+#     scalarRange = volumeNode.GetImageData().GetScalarRange()
+#     if adjust_preset:
+#         if scalarRange[1]-scalarRange[0] < 1500:
+#             # Small dynamic range, probably MRI
+#             displayNode.GetVolumePropertyNode().Copy(
+#                 volRenLogic.GetPresetByName("MR-Default"))
+#         else:
+#             # Larger dynamic range, probably CT
+#             displayNode.GetVolumePropertyNode().Copy(
+#                 volRenLogic.GetPresetByName("CT-Chest-Contrast-Enhanced"))
 
 
 class VolumePlaneWidget(object):
@@ -388,7 +388,7 @@ class PlaneCutLogic(ScriptedLoadableModuleLogic):
         inputID = inputVolume.GetID()
         logging.info(f"Input Volume ID: {inputID}")
 
-        # retrieve Display ROI Node
+        # Retrieve Display ROI Node
         volumeRoi = slicer.mrmlScene.GetFirstNodeByClass("vtkMRMLMarkupsROINode")
         if volumeRoi is None:
             raise UnboundLocalError("Display ROI not found. Please run volume rendering fisrt and check Display ROI and enable crop.")
@@ -396,7 +396,7 @@ class PlaneCutLogic(ScriptedLoadableModuleLogic):
         logging.info(f"Display ROI node: {volumeRoi.GetID()}")
         # volumeRoi.GetCenter()
 
-        # rotabe 
+        # rotate 
         trans = vtk.vtkTransform()
         logging.info(f"RAS value: {(LR, LA, LS)} xyz value: {(-LR,-LA,LS)}")
         trans.RotateX(-LR)
