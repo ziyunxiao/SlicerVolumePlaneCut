@@ -14,9 +14,9 @@ The extension is developed with Slicer 4.13 preview with Python 3.9 + VTK 9.1
 
 ## Usage
 1. Download sample data. Go to File -> Download Sample Data. Select "CTChest"
-<br>
+
 ![image](https://user-images.githubusercontent.com/48234795/161730252-09357987-5c0f-465d-89dd-4bf73da5dce5.png)
-<br>
+
 2. In the modules drop down list, select "Volume Rendering". Select Volume to "CTChest" and turn on the display ROI. Change appearence of volume rendering by selecting a preset.
 <br>
 ![image](https://user-images.githubusercontent.com/48234795/161730773-09a6b3cf-cbb3-406d-a20c-aa48e8de8edd.png)
