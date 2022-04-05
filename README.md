@@ -18,14 +18,14 @@ The extension is developed with Slicer 4.13 preview with Python 3.9 + VTK 9.1
 ![image](https://user-images.githubusercontent.com/48234795/161730252-09357987-5c0f-465d-89dd-4bf73da5dce5.png)
 
 2. In the modules drop down list, select "Volume Rendering". Select Volume to "CTChest" and turn on the display ROI. Change appearence of volume rendering by selecting a preset.
-<br>
+
 ![image](https://user-images.githubusercontent.com/48234795/161730773-09a6b3cf-cbb3-406d-a20c-aa48e8de8edd.png)
-<br>
+
 3. From the modules drop down list, Go to Utilities -> PlaneCut. Three sliders will appear with the help of which the the volume can be rotated. Choose your rotation and click on "Apply" button.
-<br>
+
 ![image](https://user-images.githubusercontent.com/48234795/161731137-b62f23a3-ba92-48ec-b68c-95d40e7ce7e5.png)
 
-<br>
+
 
 # Development tips
 ## reference objects and method
