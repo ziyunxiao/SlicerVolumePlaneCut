@@ -7,6 +7,7 @@ import ctk
 import slicer
 from slicer.ScriptedLoadableModule import *
 from slicer.util import VTKObservationMixin
+import SampleData
 # from PlaneCut.funcs import showVolumeRendering, ShowVolumePlaneCut
 
 #
