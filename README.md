@@ -25,6 +25,10 @@ The extension is developed with Slicer 4.13 preview with Python 3.9 + VTK 9.1
 
 ![image](https://user-images.githubusercontent.com/48234795/161731137-b62f23a3-ba92-48ec-b68c-95d40e7ce7e5.png)
 
+# Run test cases
+To test the extension, click on "reload and test" button. This will automatically download the sample data, perform volume rendering, enable cropping and the rotate the volume rendering at 45 degrees for further cropping to be performed.
+![image](https://user-images.githubusercontent.com/48234795/161731969-1f97f517-88be-481f-ae0d-94a51c6e6d91.png)
+
 
 
 # Development tips
