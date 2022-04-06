@@ -7,6 +7,7 @@ import ctk
 import slicer
 from slicer.ScriptedLoadableModule import *
 from slicer.util import VTKObservationMixin
+import SampleData
 # from PlaneCut.funcs import showVolumeRendering, ShowVolumePlaneCut
 
 #
@@ -432,6 +433,7 @@ class PlaneCutTest(ScriptedLoadableModuleTest):
         self.test_PlaneCut1()
 
     def test_PlaneCut1(self):
+        
         """ Ideally you should have several levels of tests.  At the lowest level
         tests should exercise the functionality of the logic with different inputs
         (both valid and invalid).  At higher levels your tests should emulate the
@@ -442,30 +444,37 @@ class PlaneCutTest(ScriptedLoadableModuleTest):
         module.  For example, if a developer removes a feature that you depend on,
         your test should break so they know that the feature is needed.
         """
+        
 
-        self.delayDisplay("Starting the test")
-
-        # Get/create input data
-
-        import SampleData
+        self.delayDisplay("Starting the test to import sample data and perform volume rendering")
+        
+        # Download sample data
+        
         inputVolume = SampleData.downloadSample('CTChest')
-        self.delayDisplay('Loaded test data set')
-
-        inputScalarRange = inputVolume.GetImageData().GetScalarRange()
-        self.assertEqual(inputScalarRange[0], 0)
-        self.assertEqual(inputScalarRange[1], 695)
-
-        # threshold = 100
-
-        # Test the module logic
-
-        logic = PlaneCutLogic()
-
-        # Test algorithm with non-inverted threshold
-        # logic.process(inputVolume, outputVolume, threshold, True)
-        # outputScalarRange = outputVolume.GetImageData().GetScalarRange()
-        # self.assertEqual(outputScalarRange[0], inputScalarRange[0])
-        # self.assertEqual(outputScalarRange[1], threshold)
-
-
-        self.delayDisplay('Test passed')
+        volumeNode = slicer.mrmlScene.GetNodeByID('vtkMRMLScalarVolumeNode1')
+         
+        # Perform volume rendering
+        volumeRenderingLogic = slicer.modules.volumerendering.logic()
+        displayNode = volumeRenderingLogic.CreateDefaultVolumeRenderingNodes(volumeNode)
+         
+        displayNode.UnRegister(slicer.mrmlScene)  
+        slicer.mrmlScene.AddNode(displayNode)
+        volumeNode.AddAndObserveDisplayNodeID(displayNode.GetID())
+        volumeRenderingLogic.UpdateDisplayNodeFromVolumeNode(displayNode, volumeNode)
+         
+        displayNode.SetVisibility(True)  
+        displayNode.SetCroppingEnabled(True)  # Enable Cropping
+        displayNode.GetROINode().SetDisplayVisibility(True)  # Turn on "Display ROI"
+         
+        displayNode.GetVolumePropertyNode().Copy(volumeRenderingLogic.GetPresetByName("CT-Chest-Contrast-Enhanced"))
+         
+        #Center the ROI node
+        
+        slicer.util.resetThreeDViews()
+         
+        #After volume rendering, use our extension to rotate LR axis by 45.
+        planeLogic=PlaneCutLogic()
+        planeLogic.process(inputVolume,45, 0, 0)
+         
+        self.delayDisplay('Test1 passed new, now you can perform cropping manually')
+             
